@@ -34,6 +34,9 @@ public class TheStack : MonoBehaviour
 
     public AudioSource audioSource;
     public AudioClip stack;
+
+    public ParticleSystem perfectEffect;
+
     void Start()
     {
         theStack = new GameObject[transform.childCount];
@@ -179,7 +182,12 @@ public class TheStack : MonoBehaviour
             }
             else
             {
-                if(combo > COMBO_START_GAIN)
+                if (perfectEffect != null)
+                {
+                    perfectEffect.Play();
+                }
+
+                if (combo > COMBO_START_GAIN)
                 {
                     stackBounds.x += STACK_BOUNDS_GAIN;
                     if (stackBounds.x > BOUNDS_SIZE)
@@ -221,6 +229,12 @@ public class TheStack : MonoBehaviour
                 }
             else
             {
+                if (perfectEffect != null)
+                {
+                    
+                    perfectEffect.Play();
+                }
+
                 if (combo > COMBO_START_GAIN)
                 {
                     stackBounds.y += STACK_BOUNDS_GAIN;
@@ -261,17 +275,25 @@ public class TheStack : MonoBehaviour
     public GameObject bestScore;
     private void EndGame()
     {
-        if(PlayerPrefs.GetInt("score") < scoreCount)
+        if (PlayerPrefs.GetInt("score") < scoreCount)
         {
             PlayerPrefs.SetInt("score", scoreCount);
+            PlayerPrefs.Save(); // luôn lưu chắc chắn
         }
 
         ganeOver = true;
         gameStart = false;
         endPanel.SetActive(true);
         bestScore.SetActive(true);
+
+        // ✅ Cập nhật text hiển thị best score ngay
+        TextMeshProUGUI bestText = bestScore.GetComponent<TextMeshProUGUI>();
+        if (bestText != null)
+            bestText.text = PlayerPrefs.GetInt("score").ToString();
+
         theStack[stackIndex].AddComponent<Rigidbody>();
     }
+
 
     public void RestartGame()
     {
